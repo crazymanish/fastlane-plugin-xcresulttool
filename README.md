@@ -12,15 +12,98 @@ fastlane add_plugin xcresulttool
 
 ## About xcresulttool
 
-A fastlane plugin for xcresulttoo
+A fastlane plugin that provides an interface to Apple's `xcrun xcresulttool` command line utility. This plugin allows you to extract, export, merge, compare, and analyze data from Xcode test result bundles (.xcresult) files.
 
-**Note to author:** Add a more detailed description about this plugin here. If your plugin contains multiple actions, make sure to mention them here.
+The plugin includes dedicated actions for each `xcresulttool` subcommand, making it easy to integrate with your fastlane workflows.
+
+## Actions
+
+### xcresulttool
+
+The main action that supports all subcommands. You can use this action with a `subcommand` parameter to access all functionalities.
+
+```ruby
+xcresulttool(
+  subcommand: "get",
+  result_bundle_path: "path/to/Test.xcresult",
+  format: "json",
+  type: "action-testSummary"
+)
+```
+
+### xcresulttool_get
+
+Extract content from an .xcresult bundle:
+
+```ruby
+xcresulttool_get(
+  result_bundle_path: "path/to/Test.xcresult",
+  type: "action-testSummary",
+  format: "json",
+  output_path: "test_summary.json" # optional
+)
+```
+
+### xcresulttool_export
+
+Export content from an .xcresult bundle:
+
+```ruby
+xcresulttool_export(
+  result_bundle_path: "path/to/Test.xcresult",
+  output_path: "output.json",
+  format: "json"
+)
+```
+
+### xcresulttool_metadata
+
+Get metadata from an .xcresult bundle:
+
+```ruby
+xcresulttool_metadata(
+  result_bundle_path: "path/to/Test.xcresult",
+  format: "human-readable",
+  output_path: "metadata.txt" # optional
+)
+```
+
+### xcresulttool_merge
+
+Merge multiple .xcresult bundles into a single bundle:
+
+```ruby
+xcresulttool_merge(
+  source_results: ["path/to/Test1.xcresult", "path/to/Test2.xcresult"],
+  output_path: "path/to/MergedResults.xcresult"
+)
+```
+
+### xcresulttool_compare
+
+Compare two .xcresult bundles and report differences:
+
+```ruby
+xcresulttool_compare(
+  result_bundle_path: "path/to/Test.xcresult",
+  baseline_path: "path/to/Baseline.xcresult",
+  format: "human-readable",
+  only_changes: true,
+  output_path: "comparison_results.txt" # optional
+)
+```
 
 ## Example
 
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
 
-**Note to author:** Please set up a sample project to make it easy for users to explore what your plugin does. Provide everything that is necessary to try out the plugin in this project (including a sample Xcode/Android project if necessary)
+## Common Use Cases
+
+- Extract test summaries to track pass/fail rates over time
+- Export test attachments (screenshots, logs) for debugging
+- Merge test results from parallel test runs
+- Compare test results between different runs or branches
+- Access test metadata for reporting
 
 ## Run tests for this plugin
 
