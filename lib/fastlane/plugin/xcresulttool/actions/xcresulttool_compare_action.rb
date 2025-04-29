@@ -12,19 +12,19 @@ module Fastlane
         Helper::XcresulttoolHelper.validate_result_bundle_path(params[:baseline_path])
         
         # Add required arguments
-        args << "--path" << params[:result_bundle_path]
+        args << params[:result_bundle_path] # Use positional argument for comparison path
         args << "--baseline-path" << params[:baseline_path]
         
-        # Add optional arguments
-        args << "--format" << params[:format] if params[:format]
-        args << "--output-path" << params[:output_path] if params[:output_path]
+        # Add comparison output options
+        args << "--summary" if params[:summary]
+        args << "--test-failures" if params[:test_failures]
+        args << "--tests" if params[:tests]
+        args << "--build-warnings" if params[:build_warnings]
+        args << "--analyzer-issues" if params[:analyzer_issues]
         
-        # Add comparison filter flags
-        args << "--only-changes" if params[:only_changes]
-        args << "--only-new-tests" if params[:only_new_tests]
-        args << "--only-deleted-tests" if params[:only_deleted_tests]
-        args << "--only-test-status-changes" if params[:only_test_status_changes]
-        args << "--only-performance-changes" if params[:only_performance_changes]
+        # Add optional output format and path if supported
+        args << "--format" << params[:format] if params[:format] && params[:format_supported]
+        args << "--output-path" << params[:output_path] if params[:output_path]
         
         args << "--verbose" if params[:verbose]
         
@@ -69,6 +69,41 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
+            key: :summary,
+            description: "Include the differential summary info in the output",
+            optional: true,
+            default_value: true,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :test_failures,
+            description: "Include the differential test failures info in the output",
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :tests,
+            description: "Include the differential tests info in the output",
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :build_warnings,
+            description: "Include the differential build warnings info in the output",
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :analyzer_issues,
+            description: "Include the differential analyzer issues info in the output",
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :format,
             description: "Output format (json, flat, human-readable)",
             optional: true,
@@ -76,45 +111,17 @@ module Fastlane
             type: String
           ),
           FastlaneCore::ConfigItem.new(
+            key: :format_supported,
+            description: "Whether the format option is supported by your version of xcresulttool (newer versions only)",
+            optional: true,
+            default_value: false,
+            is_string: false
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :output_path,
             description: "Path to save comparison results",
             optional: true,
             type: String
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :only_changes,
-            description: "Show only changes in comparison",
-            optional: true,
-            default_value: false,
-            is_string: false
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :only_new_tests,
-            description: "Show only new tests in comparison",
-            optional: true,
-            default_value: false,
-            is_string: false
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :only_deleted_tests,
-            description: "Show only deleted tests in comparison",
-            optional: true,
-            default_value: false,
-            is_string: false
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :only_test_status_changes,
-            description: "Show only test status changes in comparison",
-            optional: true,
-            default_value: false,
-            is_string: false
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :only_performance_changes,
-            description: "Show only performance changes in comparison",
-            optional: true,
-            default_value: false,
-            is_string: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :verbose,
@@ -134,13 +141,17 @@ module Fastlane
         [
           'xcresulttool_compare(
             result_bundle_path: "path/to/Test.xcresult",
-            baseline_path: "path/to/Baseline.xcresult"
+            baseline_path: "path/to/Baseline.xcresult",
+            summary: true,
+            test_failures: true
           )',
           'xcresulttool_compare(
             result_bundle_path: "path/to/Test.xcresult",
             baseline_path: "path/to/Baseline.xcresult",
-            format: "human-readable",
-            only_changes: true,
+            summary: true,
+            tests: true,
+            build_warnings: true,
+            analyzer_issues: true,
             output_path: "comparison_results.txt"
           )'
         ]
