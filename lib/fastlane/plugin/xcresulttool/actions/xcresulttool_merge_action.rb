@@ -20,9 +20,9 @@ module Fastlane
         UI.user_error!("Output path must be provided") if output_path.nil? || output_path.empty?
         args << "--output-path" << output_path
         
-        # Add source result bundle paths
+        # Add source result bundle paths directly as arguments
         source_results.each do |path|
-          args << "--input-path" << path
+          args << path
         end
         
         # Add verbose option if needed

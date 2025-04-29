@@ -21,10 +21,10 @@ module Fastlane
         status = FastlaneCore::CommandExecutor.execute(
           command: cmd,
           print_all: false,
-          print_command: true,
-          output: proc { |line| result << line },
-          error: proc { |line| UI.error(line) }
-        )
+          print_command: true
+        ) do |output|
+          result << output
+        end
         
         if status != 0
           UI.user_error!("Command failed with status #{status}")
